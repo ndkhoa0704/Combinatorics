@@ -32,6 +32,11 @@ int *GenerateGraph(int size)
     {
         rows = rand() % size;
         cols = rand() % size;
+        if (rows == cols)
+        {
+            --i;
+            continue;
+        }
         if (!graph[rows * size + cols])
             graph[rows * size + cols] = rand() % 50 + 1;
     }
