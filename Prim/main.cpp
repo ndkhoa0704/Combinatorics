@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
-#include <map>
+#include <stdlib.h>
+#include <iomanip>
 
 using namespace std;
 
@@ -17,35 +18,60 @@ int load_graph(ifstream &file, int *&graph)
     return tmp;
 }
 
+// Choose the vertex
+// Iterates to find the minimum edge length
+// Choose the vertex that the minimum-length edge links to
+// Repeat step 1
+
 int *Prim(int *graph, int size)
 {
-    int *tree = new int[size]{};
-    int min, min_i;
-    for (int i = 0; i < size; ++i)
+    int *visited = new int[size]{};
+    int *tree = new int[size * size]{};
+    int i = rand() % size;
+    int count = 0;
+    int min, tmp_index;
+    while (count < size - 1)
     {
-        min = INT16_MAX;
-        min_i = -1;
+        min = INT32_MAX;
         for (int j = 0; j < size; ++j)
         {
-            if (graph[size * i + j] != 0 && graph[size * i + j] < min)
+            if (i == j)
+                continue;
+            if (graph[size * j + i] != 0 && graph[size * j + i] < min && visited[j] != 1)
             {
-                min = graph[size * i + j];
-                min_i = j;
+                tmp_index = j;
+                min = graph[size * j + i];
             }
         }
-        if (min_i != -1)
-            tree[i] = min_i;
+        ++count;
+        tree[size * i + tmp_index] = min;
+        tree[size * tmp_index + i] = min;
+        visited[i] = 1;
+        i = tmp_index;
     }
+    delete[] visited;
     return tree;
 }
+
 void save_tree(ofstream &file, int *tree, int size)
 {
-    for (int i = 0; i < size; ++i)
-        file << i << ": " << tree[i] << endl;
+    {
+        file << size << endl;
+        int i;
+        for (i = 0; i < size - 1; ++i)
+        {
+            for (int j = 0; j < size; ++j)
+                file << left << setw(3) << tree[size * j + i];
+            file << endl;
+        }
+        for (int j = 0; j < size; ++j)
+            file << left << setw(3) << tree[size * j + i];
+    }
 }
 
 int main()
 {
+    srand(time(0));
     ifstream fin("graph");
     if (!fin.is_open())
         return -1;
