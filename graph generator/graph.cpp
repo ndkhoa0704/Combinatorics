@@ -35,7 +35,7 @@ int *GenerateGraph_no_loop(int size)
             j = rand() % size;
             if (!graph[i * size + j] && i != j)
             {
-                tmp = rand() % 50 + 1;
+                tmp = rand() % 99 + 1;
                 graph[i * size + j] = tmp;
                 graph[j * size + i] = tmp;
             }
@@ -56,7 +56,7 @@ int *GenerateGraph_with_loop(int size)
             j = rand() % size;
             if (!graph[i * size + j])
             {
-                tmp = rand() % 50 + 1;
+                tmp = rand() % 99 + 1;
                 graph[i * size + j] = tmp;
                 graph[j * size + i] = tmp;
             }
@@ -75,7 +75,7 @@ int *GenerateGraph_directional_with_loop(int size)
         {
             j = rand() % size;
             if (!graph[i * size + j])
-                graph[i * size + j] = rand() % 50 + 1;
+                graph[i * size + j] = rand() % 99 + 1;
         }
     }
     return graph;
@@ -91,7 +91,45 @@ int *GenerateGraph_directional_no_loop(int size)
         {
             j = rand() % size;
             if (!graph[i * size + j] && i != j)
-                graph[i * size + j] = rand() % 50 + 1;
+                graph[i * size + j] = rand() % 99 + 1;
+        }
+    }
+    return graph;
+}
+
+int *GenerateGraph_no_loop_no_length(int size)
+{
+    int *graph = new int[size * size]{};
+    for (int num_of_edge, j, i = 0; i < size; ++i)
+    {
+        num_of_edge = rand() % (size - 1) + 1;
+        for (int l = 0; l < num_of_edge; ++l)
+        {
+            j = rand() % size;
+            if (!graph[i * size + j] && i != j)
+            {
+                graph[i * size + j] = 1;
+                graph[j * size + i] = 1;
+            }
+        }
+    }
+    return graph;
+}
+
+int *GenerateGraph_with_loop_no_length(int size)
+{
+    int *graph = new int[size * size]{};
+    for (int num_of_edge, j, i = 0; i < size; ++i)
+    {
+        num_of_edge = rand() % (size - 1) + 1;
+        for (int l = 0; l < num_of_edge; ++l)
+        {
+            j = rand() % size;
+            if (!graph[i * size + j])
+            {
+                graph[i * size + j] = 1;
+                graph[j * size + i] = 1;
+            }
         }
     }
     return graph;
@@ -129,10 +167,6 @@ int main(int argc, char *argv[])
     srand(time(NULL));
     int *graph = nullptr;
 
-    // 1 no loop
-    // 2 loop
-    // 3 directional, no loop
-    // 4 directional, loop
     switch (atoi(argv[3]))
     {
     case 1:
@@ -146,6 +180,12 @@ int main(int argc, char *argv[])
         break;
     case 4:
         graph = GenerateGraph_directional_with_loop(size);
+        break;
+    case 5:
+        graph = GenerateGraph_no_loop_no_length(size);
+        break;
+    case 6:
+        graph = GenerateGraph_with_loop_no_length(size);
         break;
     default:
         cout << "Invalid argument" << endl;
