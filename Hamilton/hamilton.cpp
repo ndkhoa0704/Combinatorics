@@ -3,7 +3,7 @@
 
 using namespace std;
 
-void load_graph(ifstream &file)
+int *load_graph(ifstream &file)
 {
 }
 

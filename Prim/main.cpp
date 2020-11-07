@@ -2,6 +2,7 @@
 #include <fstream>
 #include <stdlib.h>
 #include <iomanip>
+#include <exception>
 
 using namespace std;
 
@@ -28,26 +29,48 @@ int *Prim(int *graph, int size)
     int *visited = new int[size]{};
     int *tree = new int[size * size]{};
     int i = rand() % size;
-    int count = 0;
-    int min, tmp_index;
-    while (count < size - 1)
+    int count = 1;
+    int min, j, k, min_i1, min_i2;
+    while (count < size)
     {
-        min = INT32_MAX;
-        for (int j = 0; j < size; ++j)
+        min = INT16_MAX;
+        min_i1 = -1;
+        min_i2 = -1;
+        for (j = 0; j < size; ++j)
         {
-            if (i == j)
-                continue;
-            if (graph[size * j + i] != 0 && graph[size * j + i] < min && visited[j] != 1)
+            if (!visited[j] && graph[size * i + j] != 0 && graph[size * i + j] < min && i != j)
             {
-                tmp_index = j;
-                min = graph[size * j + i];
+                min = graph[size * i + j];
+                min_i1 = j;
             }
         }
-        ++count;
-        tree[size * i + tmp_index] = min;
-        tree[size * tmp_index + i] = min;
+        for (k = 0; k < size; ++k)
+        {
+            if (visited[k])
+            {
+                if (graph[size * k + j] != 0 && graph[size * k + j] < min && k != j)
+                {
+                    min = graph[size * k + j];
+                    min_i1 = k;
+                }
+            }
+        }
         visited[i] = 1;
-        i = tmp_index;
+        if (min_i1 != -1)
+        {
+            i = min_i1;
+        }
+        if (min_i2 != -1)
+        {
+            tree[size * j + min_i2] = min;
+            tree[size * k + min_i2] = min;
+        }
+        else
+        {
+            tree[size * i + j] = min;
+            tree[size * j + i] = min;
+        }
+        ++count;
     }
     delete[] visited;
     return tree;
@@ -79,8 +102,10 @@ int main()
     int size = load_graph(fin, graph);
     fin.close();
     int *tree = Prim(graph, size);
-    ofstream fout("result");
+    ofstream fout;
+    fout.open("result", ios::out);
     save_tree(fout, tree, size);
+    fout.close();
     delete[] graph;
     delete[] tree;
 }
