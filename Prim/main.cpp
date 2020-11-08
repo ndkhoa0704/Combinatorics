@@ -24,10 +24,9 @@ int load_graph(ifstream &file, int *&graph)
 // Choose the vertex that the minimum-length edge links to
 // Repeat step 1
 
-int *Prim(int *graph, int size)
+bool Prim(int *graph, int *&tree, int size)
 {
     int *visited = new int[size]{};
-    int *tree = new int[size * size]{};
     int i = rand() % size;
     int count = 1;
     int min, j, k, min_i1, min_i2;
@@ -38,7 +37,7 @@ int *Prim(int *graph, int size)
         min_i2 = -1;
         for (j = 0; j < size; ++j)
         {
-            if (!visited[j] && graph[size * i + j] != 0 && graph[size * i + j] < min && i != j)
+            if (i != j && !visited[j] && graph[size * i + j] != 0 && graph[size * i + j] < min)
             {
                 min = graph[size * i + j];
                 min_i1 = j;
@@ -48,32 +47,31 @@ int *Prim(int *graph, int size)
         {
             if (visited[k])
             {
-                if (graph[size * k + j] != 0 && graph[size * k + j] < min && k != j)
+                if (k != min_i1 && graph[size * k + min_i1] != 0 && graph[size * k + min_i1] < min)
                 {
-                    min = graph[size * k + j];
-                    min_i1 = k;
+                    min = graph[size * k + min_i1];
+                    min_i2 = k;
                 }
             }
         }
+        if (min_i1 == -1)
+            return false;
         visited[i] = 1;
-        if (min_i1 != -1)
-        {
-            i = min_i1;
-        }
         if (min_i2 != -1)
         {
-            tree[size * j + min_i2] = min;
-            tree[size * k + min_i2] = min;
+            tree[size * min_i1 + min_i2] = min;
+            tree[size * min_i2 + min_i1] = min;
         }
         else
         {
-            tree[size * i + j] = min;
-            tree[size * j + i] = min;
+            tree[size * i + min_i1] = min;
+            tree[size * min_i1 + i] = min;
+            i = min_i1;
         }
         ++count;
     }
     delete[] visited;
-    return tree;
+    return true;
 }
 
 void save_tree(ofstream &file, int *tree, int size)
@@ -101,7 +99,9 @@ int main()
     int *graph = nullptr;
     int size = load_graph(fin, graph);
     fin.close();
-    int *tree = Prim(graph, size);
+    int *tree = new int[size * size]{};
+    if (!Prim(graph, tree, size))
+        return -1;
     ofstream fout;
     fout.open("result", ios::out);
     save_tree(fout, tree, size);
