@@ -102,7 +102,7 @@ int *GenerateGraph_no_loop_no_length(int size)
     int *graph = new int[size * size]{};
     for (int num_of_edge, j, i = 0; i < size; ++i)
     {
-        num_of_edge = rand() % (size - 1) + 1;
+        num_of_edge = rand() % (size/3);
         for (int l = 0; l < num_of_edge; ++l)
         {
             j = rand() % size;
@@ -149,25 +149,42 @@ void save_graph(ofstream &file, int *graph, int size)
         file << left << setw(3) << graph[size * j + i];
 }
 
+void save_graph_space_only(ofstream &file, int *graph, int size)
+{
+    file << size << endl;
+    int i;
+    for (i = 0; i < size - 1; ++i)
+    {
+        for (int j = 0; j < size; ++j)
+            file << graph[size * j + i] << " ";
+        file << endl;
+    }
+    for (int j = 0; j < size; ++j)
+        file << graph[size * j + i] << " ";
+}
+
+//
+// eg ./main 9 graph.txt 1
+
 int main(int argc, char *argv[])
 {
     int size;
     if (argc != 4 || !(size = checkArg(argv[1])))
     {
-        cout << "Invalid argument" << endl;
+        cout << "Usage: size path mode" << endl;
         return -1;
     }
     ofstream file(argv[2]);
     if (!file.is_open())
     {
-        cout << "Invalid argument" << endl;
+        cout << "Usage: size path mode" << endl;
         file.close();
         return -1;
     }
     srand(time(NULL));
     int *graph = nullptr;
-
-    switch (atoi(argv[3]))
+    int opt = atoi(argv[3]);
+    switch (opt)
     {
     case 1:
         graph = GenerateGraph_no_loop(size);
@@ -192,7 +209,10 @@ int main(int argc, char *argv[])
         file.close();
         return -1;
     }
-    save_graph(file, graph, size);
+    if (opt > 4)
+        save_graph_space_only(file, graph, size);
+    else
+        save_graph(file, graph, size);
     delete[] graph;
     file.close();
 }
