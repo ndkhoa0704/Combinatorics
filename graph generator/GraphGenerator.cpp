@@ -102,7 +102,7 @@ int *GenerateGraph_no_loop_no_length(int size)
     int *graph = new int[size * size]{};
     for (int num_of_edge, j, i = 0; i < size; ++i)
     {
-        num_of_edge = rand() % (size/3);
+        num_of_edge = rand() % (size / 3);
         for (int l = 0; l < num_of_edge; ++l)
         {
             j = rand() % size;
@@ -165,19 +165,30 @@ void save_graph_space_only(ofstream &file, int *graph, int size)
 
 //
 // eg ./main 9 graph.txt 1
-
+void printUsage()
+{
+    cout << "Usage: [graph-size] [output-path] [mode]\n";
+    cout << "Description: generate an adjacency matrix\n";
+    cout << "Mode:\n";
+    cout << "1. GenerateGraph_no_loop\n";
+    cout << "2. GenerateGraph_with_loop\n";
+    cout << "3. GenerateGraph_directional_no_loop\n";
+    cout << "4. GenerateGraph_directional_with_loop\n";
+    cout << "5. GenerateGraph_no_loop_no_length\n";
+    cout << "6. GenerateGraph_with_loop_no_length\n";
+}
 int main(int argc, char *argv[])
 {
     int size;
     if (argc != 4 || !(size = checkArg(argv[1])))
     {
-        cout << "Usage: size path mode" << endl;
+        printUsage();
         return -1;
     }
     ofstream file(argv[2]);
     if (!file.is_open())
     {
-        cout << "Usage: size path mode" << endl;
+        printUsage();
         file.close();
         return -1;
     }
